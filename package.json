@@ -1,0 +1,24 @@
+{
+  "name": "mygithubaction",
+  "version": "1.0.0",
+  "description": "This is an example of a **custom GitHub action**, developed during the course: https://www.linkedin.com/learning/learning-github-actions-2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/floverde/floverde-github-custom-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/floverde/floverde-github-custom-action/issues"
+  },
+  "homepage": "https://github.com/floverde/floverde-github-custom-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0"
+  }
+}
