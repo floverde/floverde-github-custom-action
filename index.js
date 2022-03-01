@@ -9,6 +9,14 @@ try {
 
   console.log(`Edge Grid successfully instantiated!!!`);
 
+  eg.auth({
+    path: '/api-definitions/v2/contracts/groups',
+    method: 'GET',
+    headers: {},
+  }).send(function (error, response, body) {
+    console.log(body);
+  });
+
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
 } catch (error) {
