@@ -324,7 +324,7 @@ class Application {
 				// Check if an endpoint with the requested name already exists
 				if (endPoint) {
 					// Log group: 'Search API by name' - end
-					core.info(`API with name "${apiMetadata.name}" already exists.`);
+					core.info(`API "${apiMetadata.name}" already exists.`);
 					core.endGroup();
 					// Log groudp: 'Update API definition' - start
 					core.startGroup(`Update API ${endPoint.apiEndPointId} definition...`);
@@ -342,7 +342,7 @@ class Application {
 					});
 				} else {
 					// Log group: 'Search API by name' - end
-					core.info(`API with name "${apiMetadata.name}" not found.`);
+					core.info(`API "${apiMetadata.name}" not found.`);
 					core.endGroup();
 					// Log groudp: 'Create new API definition' - start
 					core.startGroup("Create new API definition...");
