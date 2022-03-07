@@ -136,8 +136,7 @@ class Application {
 					}
 				} else {
 					// Writes an error message and aborts execution
-					core.setFailed(error);
-					process.exit(7);
+					Application.handleHttpError(error);
 				}
 			}.bind(this));
 		}.call(this, 0, 1));
@@ -151,7 +150,7 @@ class Application {
 	createEndpoint(callback) {
 		// Executes the REST call to the Admin API
 		this.eg.auth({
-			path: '/api-definitions/v2/endpoints/files',
+			path: '/api-definitions/v2/endpoints/files0',
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -171,8 +170,7 @@ class Application {
 				callback.call(this, response.data);
 			} else {
 				// Writes an error message and aborts execution
-				core.setFailed(error);
-				process.exit(7);
+				Application.handleHttpError(error);
 			}
 		}.bind(this));
 	}
@@ -227,8 +225,7 @@ class Application {
 				callback.call(this, cloneVersion);
 			} else {
 				// Writes an error message and aborts execution
-				core.setFailed(error);
-				process.exit(7);
+				Application.handleHttpError(error);
 			}
 		}.bind(this));
 	}
@@ -263,8 +260,7 @@ class Application {
 				callback.call(this, response.data);
 			} else {
 				// Writes an error message and aborts execution
-				core.setFailed(error);
-				process.exit(7);
+				Application.handleHttpError(error);
 			}
 		}.bind(this));
 	}
@@ -293,6 +289,20 @@ class Application {
 			// Raises error indicating invalid version format
 			throw Error("Invalid version format");
 		}
+	}
+	
+	/**
+	 * Writes an error message and aborts execution.
+	 *
+	 * @param error - HTTP Error.
+	 */
+	static handleHttpError(error) {
+		if (Object.hasOwnProperty(error, 'data')) {
+			core.setFailed(`HTTP ${error.data.status} ${error.data.title} - ${error.data.detail}`);
+		} else {
+			core.setFailed(error);
+		}
+		process.exit(7);
 	}
 	
 	/**
