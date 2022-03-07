@@ -316,7 +316,7 @@ class Application {
 					core.info(`API with name "${apiMetadata.name}" already exists.`);
 					core.endGroup();
 					// Log groudp: 'Update API definition' - start
-					core.setGroup(`Update API ${endPoint.apiEndPointId} definition...`);
+					core.startGroup(`Update API ${endPoint.apiEndPointId} definition...`);
 					// Check whether to overwrite the current version or to upgrade
 					let overrideVersion = Application.sameMajorMinorVersion(endPoint.source.apiVersion, apiMetadata.version);
 					// Updates the API definition by importing the new OpenAPI specification
@@ -334,7 +334,7 @@ class Application {
 					core.info(`API with name "${apiMetadata.name}" not found.`);
 					core.endGroup();
 					// Log groudp: 'Create new API definition' - start
-					core.setGroup("Create new API definition...");
+					core.startGroup("Create new API definition...");
 					// Creates a new API by importing the definition provided as input
 					this.createEndpoint(function(endPoint) {
 						// Exports the unique identifier of the API within the Akamai Gateway
