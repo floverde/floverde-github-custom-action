@@ -1,7 +1,12 @@
 const core = require('@actions/core');
 const EdgeGrid = require('akamai-edgegrid');
 
-try {
+console.log('client-token:', core.getInput('client-token'));
+console.log('client-secret:', core.getInput('client-secret'));
+console.log('access-token:', core.getInput('access-token'));
+console.log('base-uri:', core.getInput('base-uri'));
+
+/*try {
   var eg = new EdgeGrid(core.getInput('client-token'),
 						core.getInput('client-secret'),
 						core.getInput('access-token'),
@@ -21,4 +26,4 @@ try {
   core.setOutput("time", time);
 } catch (error) {
   core.setFailed(error.message);
-}
+}*/
