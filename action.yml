@@ -4,7 +4,7 @@ inputs:
   api-content:
     description: Content of the API definition file encoded in Base64 (see [RFC 4648](https://tools.ietf.org/html/rfc4648) for details).
     required: true
-  akamai-base-uri:
+  admin-api-uri:
     description: Base URI of Akamai's Admin API to which requests will be forwarded (e.g. `https://akaa-baseurl-xxxxxxxxxxx-xxxxxxxxxxxxx.luna.akamaiapis.net/`).
     required: true
   access-token:
