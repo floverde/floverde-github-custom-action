@@ -43,7 +43,7 @@ class Application {
 				// Check if no server in its description matches the parameter provided
 				if (input.servers.length == 0) {
 					// Writes an error message and aborts execution
-					core.setFailed(`No server matching description "${this.apiServer)" in the API definition`);
+					core.setFailed(`No server matching description "${this.apiServer}" in the API definition`);
 					process.exit(7);
 				}
 			}
