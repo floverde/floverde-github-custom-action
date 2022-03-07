@@ -1,0 +1,24 @@
+{
+  "name": "apib-include-directive",
+  "version": "0.1.0",
+  "description": "Expand include directive in API Blueprint",
+  "main": "lib/main.js",
+  "scripts": {
+    "prepublish": "coffee --compile --output lib/ src/",
+    "test": "mocha --compilers coffee:coffee-script/register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kminami/apib-include-directive.git"
+  },
+  "author": "Daniel G. Taylor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kminami/apib-include-directive/issues"
+  },
+  "homepage": "https://github.com/kminami/apib-include-directive#readme",
+  "devDependencies": {
+    "coffee-script": "^1.12.4",
+    "mocha": "^3.2.0"
+  }
+}
