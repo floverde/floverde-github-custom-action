@@ -1,13 +1,40 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: "Akamai Gateway Deploy"
+description: "Deploys an OpenAPI 3 specification into an Akamai gateway"
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  api-content:
+    description: Content of the API definition file encoded in Base64 (see [RFC 4648](https://tools.ietf.org/html/rfc4648) for details).
     required: true
-    default: 'World'
+  akamai-base-uri:
+    description: Base URI of Akamai's Admin API to which requests will be forwarded (e.g. `https://akaa-baseurl-xxxxxxxxxxx-xxxxxxxxxxxxx.luna.akamaiapis.net/`).
+    required: true
+  access-token:
+    description: Akamai access token (see [Akamai EdgeGrid](https://techdocs.akamai.com/developer/docs/authenticate-with-edgegrid) for details).
+    required: true
+  client-secret:
+    description: Akamai client secret (see [Akamai EdgeGrid](https://techdocs.akamai.com/developer/docs/authenticate-with-edgegrid) for details).
+    required: true
+  client-token:
+    description: Akamai client token (see [Akamai EdgeGrid](https://techdocs.akamai.com/developer/docs/authenticate-with-edgegrid) for details).
+    required: true
+  api-server:
+    description: (Optional) Specifies which server to use if the API definition contains more than one.
+    required: false
+  contract-id:
+    description: Unique identifier for the Akamai contract under which to provision the endpoint.
+    required: true
+    default: "1-2681AU"
+  group-id:
+    description: Unique identifier for the Akamai group under which to provision the endpoint.
+    required: true
+    default: 212029
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  api-endpoint-id:
+    description: Unique API endpoint identifier within the Akamai Gateway.
+  api-version-number:
+    description: Version number of the API endpoint within the Akamai Gateway.
 runs:
   using: 'node16'
   main: 'index.js'
+branding:
+  icon: 'upload-cloud'
+  color: 'blue'

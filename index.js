@@ -1,15 +1,10 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
-} catch (error) {
-  core.setFailed(error.message);
-}
+console.log('api-content:', core.getInput('api-content', { required: true }).substring(0, 20));
+console.log('akamai-base-uri:', core.getInput('akamai-base-uri', { required: true }));
+console.log('access-token:', core.getInput('access-token', { required: true }));
+console.log('client-token:', core.getInput('client-token', { required: true }));
+console.log('client-secret:', core.getInput('client-secret', { required: true }));
+console.log('contract-id:', parseInt(core.getInput('group-id', { required: true })));
+console.log('api-server:', core.getInput('api-server', { required: false }));
