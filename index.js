@@ -150,7 +150,7 @@ class Application {
 	createEndpoint(callback) {
 		// Executes the REST call to the Admin API
 		this.eg.auth({
-			path: '/api-definitions/v2/endpoints/files0',
+			path: '/api-definitions/v2/endpoints/files',
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -297,8 +297,9 @@ class Application {
 	 * @param error - HTTP Error.
 	 */
 	static handleHttpError(error) {
-		if (Object.hasOwnProperty(error, 'data')) {
-			core.setFailed(`HTTP ${error.data.status} ${error.data.title} - ${error.data.detail}`);
+		if (error['response'] && error.response['data']) {
+			error = error.response.data;
+			core.setFailed(`HTTP ${error.status} ${error.title} - ${error.detail}`);
 		} else {
 			core.setFailed(error);
 		}
