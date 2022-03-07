@@ -345,7 +345,7 @@ class Application {
 						core.info(`Created API (ID: ${endPoint.apiEndPointId}).`);
 						core.endGroup();
 					});
-				}*/
+				}
 			});
 		});
 	}
