@@ -1,4 +1,5 @@
-const YAML = require('yaml')
+const YAML = require('yaml');
+const core = require('@actions/core');
 const EdgeGrid = require('akamai-edgegrid');
 const ApiSpecConverter = require('api-spec-converter');
 
@@ -7,9 +8,9 @@ class Application {
 	 * Class constructor.
 	 */
 	constructor() {
-		const accessToken = core.getInput('access-token', { required: true });
 		const clientToken = core.getInput('client-token', { required: true });
 		const clientSecret = core.getInput('client-secret', { required: true });
+		const accessToken = core.getInput('access-token', { required: true });
 		const adminApiUri = core.getInput('admin-api-uri', { required: true });
 		this.eg = new EdgeGrid(clientToken, clientSecret, accessToken, adminApiUri);
 		this.apiServer = core.getInput('api-server', { required: false }).toLowerCase();
@@ -148,7 +149,7 @@ class Application {
 	 * @param {Function((Object) => void)}	callback - callback that intercepts the newly created API endpoint.
 	 */
 	createEndpoint(callback) {
-		core.info("-- Create new API definition...");
+		core.info(">> Create new API definition...");
 		// Executes the REST call to the Admin API
 		this.eg.auth({
 			path: '/api-definitions/v2/endpoints/files',
@@ -209,7 +210,7 @@ class Application {
 	 * @param {Function((integer) => void)}	callback		- callback that intercepts the version number of the clone.
 	 */
 	cloneVersion(apiId, versionNumber, callback) {
-		core.info(`-- Cloning of API ${apiId} version ${versionNumber} in progress...`);
+		core.info(`>> Cloning of API ${apiId} version ${versionNumber} in progress...`);
 		// Executes the REST call to the Admin API
 		this.eg.auth({
 			path: `/api-definitions/v2/endpoints/${apiId}/versions/${versionNumber}/cloneVersion`,
@@ -222,7 +223,7 @@ class Application {
 			if (response) {
 				// Retrieves the version value of the API clone
 				let cloneVersion = JSON.parse(body).versionNumber;
-				core.info(`++ Cloned the API ${apiId} version ${versionNumber} (new version: ${cloneVersion}).`);
+				core.info(`<< Cloned the API ${apiId} version ${versionNumber} (new version: ${cloneVersion}).`);
 				// Invokes the callback that intercepts the value of the API clone version
 				callback.call(this, cloneVersion);
 			} else {
@@ -240,7 +241,7 @@ class Application {
 	 * @param {Function((Object) => void)}	callback		- callback that intercepts the updated API endpoint.
 	 */
 	editVersion(apiId, versionNumber, callback) {
-		core.info(`-- Updating the API definition ${apiId} version ${versionNumber}...`);
+		core.info(`>> Updating the API definition ${apiId} version ${versionNumber}...`);
 		// Executes the REST call to the Admin API
 		this.eg.auth({
 			path: `/api-definitions/v2/endpoints/${apiId}/versions/${versionNumber}/file`,
@@ -300,24 +301,31 @@ class Application {
 	 */
 	main() {
 		// Prepares the OpenAPI specification for import into the Akamai Gateway
-		this.refineOpenApiSpec(function(inputMetadata) {
+		this.refineOpenApiSpec(function(apiMetadata) {
 			// Search among all API endpoints for the one with the required name
-			this.getEndpointByName(inputMetadata.name, function(endPoint) {
+			this.getEndpointByName(apiMetadata.name, function(endPoint) {
 				// Check if an endpoint with the requested name already exists
 				if (endPoint) {
 					// Check whether to overwrite the current version or to upgrade
-					let overrideVersion = Application.sameMajorMinorVersion(endPoint.source.apiVersion, inputMetadata.version);
+					let overrideVersion = Application.sameMajorMinorVersion(endPoint.source.apiVersion, apiMetadata.version);
 					// Updates the API definition by importing the new OpenAPI specification
 					this.updateEndpoint(endPoint.apiEndPointId, endPoint.versionNumber, overrideVersion, function(endPoint) {
+						// Exports the unique identifier of the API within the Akamai Gateway
+						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
+						// Exports the version number of the API within the Akamai Gateway
+						core.setOutput("api-version-number", endPoint.versionNumber);
 						// Operation successfully completed
-						core.info(`++ Updated the API definition ${endPoint.apiEndPointId} version ${endPoint.versionNumber}.`);
-						core.info(endPoint);
+						core.info(`<< Updated the API (ID: ${endPoint.apiEndPointId}, version: ${endPoint.versionNumber}).`);
 					});
 				} else {
 					// Creates a new API by importing the definition provided as input
 					this.createEndpoint(function(endpoint) {
+						// Exports the unique identifier of the API within the Akamai Gateway
+						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
+						// Exports the version number of the API within the Akamai Gateway
+						core.setOutput("api-version-number", endPoint.versionNumber);
 						// Operation successfully completed.
-						core.info("++ Created OpenAPI Spec");
+						core.info(`<< Created API (ID: ${endPoint.apiEndPointId}, version: ${endPoint.versionNumber}).`);
 					});
 				}
 			});
