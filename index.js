@@ -26,7 +26,8 @@ class Application {
 	 * It performs the following adjustments:
 	 * 1) If the `api-server` parameter is specified, it removes servers
 	 *    whose description does not match the value provided;
-	 * 2) Converts API definition from OpenAPI 3 to Swagger 2 format.
+	 * 2) For each resource in the API replace the description with the summary.
+	 * 3) Converts API definition from OpenAPI 3 to Swagger 2 format.
 	 *
 	 * Through the callback, metadata extracted from the API definition is also returned.
 	 *
@@ -39,6 +40,8 @@ class Application {
 		if (Array.isArray(input.servers) && input.servers.length > 0) {
 			// Check whether to use a specific server among those in the specification
 			if (this.apiServer) {
+				// Writes an information message on the log
+				core.info(`Search for the server whose description contains the keyword: ${this.apiServer}`);
 				// Retain only the server whose description matches that provided by the 'api-server' parameter
 				input.servers = input.servers.filter(server => server.description.toLowerCase().includes(this.apiServer));
 				// Check if no server in its description matches the parameter provided
@@ -53,6 +56,17 @@ class Application {
 			core.setFailed('No server declared in the API definition');
 			process.exit(7);
 		}
+		// Writes an information message on the log
+		core.info("Highlighting the 'summary' field for each resource.");
+		// For each resource in the API replace the description with the summary
+		Object.values(converted.spec.paths).forEach(function(it) {
+			Object.values(it).forEach(function(it) {
+				it.description = it.summary;
+				delete it.summary;
+			})
+		});
+		// Writes an information message on the log
+		core.info('Converting API definition from OpenAPI 3 to Swagger 2 format');
 		// Converts API definition from OpenAPI 3 to Swagger 2 format
 		ApiSpecConverter.convert({
 			from: 'openapi_3',
