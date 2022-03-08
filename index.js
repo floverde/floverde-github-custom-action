@@ -346,13 +346,13 @@ class Application {
 					let overrideVersion = Application.sameMajorMinorVersion(endPoint.source.apiVersion, apiMetadata.version);
 					// Updates the API definition by importing the new OpenAPI specification
 					this.updateEndpoint(endPoint.apiEndPointId, endPoint.versionNumber, overrideVersion, function(endPoint) {
+						// Operation successfully completed
+						core.info(`Updated the API (ID: ${endPoint.apiEndPointId}, version: ${endPoint.versionNumber}).`);
+						core.endGroup();
 						// Exports the unique identifier of the API within the Akamai Gateway
 						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
 						// Exports the version number of the API within the Akamai Gateway
 						core.setOutput("api-version-number", endPoint.versionNumber);
-						// Operation successfully completed
-						core.info(`Updated the API (ID: ${endPoint.apiEndPointId}, version: ${endPoint.versionNumber}).`);
-						core.endGroup();
 					});
 				} else {
 					// Log group: 'Search API by name' - end
@@ -362,13 +362,13 @@ class Application {
 					core.startGroup("Create new API definition...");
 					// Creates a new API by importing the definition provided as input
 					this.createEndpoint(function(endPoint) {
+						// Operation successfully completed.
+						core.info(`Created API (ID: ${endPoint.apiEndPointId}).`);
+						core.endGroup();
 						// Exports the unique identifier of the API within the Akamai Gateway
 						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
 						// Exports the version number of the API within the Akamai Gateway
 						core.setOutput("api-version-number", endPoint.versionNumber);
-						// Operation successfully completed.
-						core.info(`Created API (ID: ${endPoint.apiEndPointId}).`);
-						core.endGroup();
 					});
 				}
 			});
