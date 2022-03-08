@@ -17,7 +17,7 @@ class Application {
 		this.groupId = parseInt(core.getInput('group-id', { required: true }));
 		this.contractId = core.getInput('contract-id', { required: true });
 		this.apiContent = core.getInput('api-content', { required: true });
-		core.info('Edge Grid successfully instantiated');
+		core.info('# Edge Grid successfully instantiated');
 	}
 	
 	/**
@@ -368,7 +368,7 @@ class Application {
 						core.info(`Updated API (ID: ${endPoint.apiEndPointId}, version: ${endPoint.versionNumber}).`);
 						core.endGroup();
 						// Operation successfully completed
-						core.info("Done");
+						core.info("# Done");
 						// Exports the unique identifier of the API within the Akamai Gateway
 						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
 						// Exports the version number of the API within the Akamai Gateway
@@ -380,7 +380,7 @@ class Application {
 					// Creates a new API by importing the definition provided as input
 					this.createEndpoint(function(endPoint) {
 						// Operation successfully completed
-						core.info("Done");
+						core.info("# Done");
 						// Exports the unique identifier of the API within the Akamai Gateway
 						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
 						// Exports the version number of the API within the Akamai Gateway
