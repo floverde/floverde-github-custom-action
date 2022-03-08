@@ -59,7 +59,7 @@ class Application {
 		// Writes an information message on the log
 		core.info("Highlighting the 'summary' field for each resource.");
 		// For each resource in the API replace the description with the summary
-		Object.values(converted.spec.paths).forEach(function(it) {
+		Object.values(input.paths).forEach(function(it) {
 			Object.values(it).forEach(function(it) {
 				it.description = it.summary;
 				delete it.summary;
@@ -221,7 +221,7 @@ class Application {
 	 * @param {Function((integer) => void)}	callback		- callback that intercepts the version number of the clone.
 	 */
 	cloneVersion(apiId, versionNumber, callback) {
-		core.info(`>> Cloning of API ${apiId} version ${versionNumber} in progress...`);
+		core.info(`Cloning of API ${apiId} version ${versionNumber} in progress...`);
 		// Executes the REST call to the Admin API
 		this.eg.auth({
 			path: `/api-definitions/v2/endpoints/${apiId}/versions/${versionNumber}/cloneVersion`,
@@ -234,7 +234,7 @@ class Application {
 			if (response) {
 				// Retrieves the version value of the API clone
 				let cloneVersion = response.data.versionNumber;
-				core.info(`<< Cloned the API ${apiId} version ${versionNumber} (new version: ${cloneVersion}).`);
+				core.info(`Cloned the API ${apiId} version ${versionNumber} (new version: ${cloneVersion}).`);
 				// Invokes the callback that intercepts the value of the API clone version
 				callback.call(this, cloneVersion);
 			} else {
@@ -251,7 +251,7 @@ class Application {
 	 * @param {Function((Object) => void)}	callback		- callback that intercepts the updated API endpoint.
 	 */
 	editVersion(apiId, versionNumber, callback) {
-		core.info(`>> Updating the API definition ${apiId} version ${versionNumber}...`);
+		core.info(`Updating the API definition ${apiId} version ${versionNumber}...`);
 		// Executes the REST call to the Admin API
 		this.eg.auth({
 			path: `/api-definitions/v2/endpoints/${apiId}/versions/${versionNumber}/file`,
@@ -381,7 +381,7 @@ class Application {
  */
 try {
 	new Application().main();
-} catch(err) {
+} catch(error) {
 	core.setFailed(error);
 	process.exit(7);
 }
