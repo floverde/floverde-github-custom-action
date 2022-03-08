@@ -34,6 +34,8 @@ class Application {
 	 * @param {Function((Object) => void)}	callback - callback to continue the workflow.
 	 */
 	refineOpenApiSpec(callback) {
+		// Writes an information message on the log
+		core.startGroup('Refining API definition in progress...');
 		// Decode and parse the API definition serialised in YAML
 		const input = YAML.parse(Buffer.from(this.apiContent, "base64").toString("utf8"));
 		// Check that at least one server has been declared in the specification
@@ -41,7 +43,7 @@ class Application {
 			// Check whether to use a specific server among those in the specification
 			if (this.apiServer) {
 				// Writes an information message on the log
-				core.info(`Search for the server whose description contains the keyword: ${this.apiServer}`);
+				core.info(`Search for the server whose description contains the keyword: "${this.apiServer}"`);
 				// Retain only the server whose description matches that provided by the 'api-server' parameter
 				input.servers = input.servers.filter(server => server.description.toLowerCase().includes(this.apiServer));
 				// Check if no server in its description matches the parameter provided
@@ -57,7 +59,7 @@ class Application {
 			process.exit(7);
 		}
 		// Writes an information message on the log
-		core.info("Highlighting the 'summary' field for each resource.");
+		core.info('Highlighting the "summary" field for each resource.');
 		// For each resource in the API replace the description with the summary
 		Object.values(input.paths).forEach(function(it) {
 			Object.values(it).forEach(function(it) {
@@ -76,6 +78,9 @@ class Application {
 		.then(function(converted) {
 			// Encode the Swagger 2 version of the API definition in base 64
 			this.apiContent = Buffer.from(converted.stringify()).toString("base64");
+			// Writes an information message on the log
+			core.info('Completed.');
+			core.endGroup();
 			// Invokes the callback to continue the workflow by providing the API metadata
 			callback.call(this, {
 				name: converted.spec.info.title,
@@ -97,6 +102,8 @@ class Application {
 	 * @param {Function((Object|null) => void)}	callback		- callback that intercepts the found API endpoint.
 	 */
 	getEndpointByName(endPointName, callback) {
+		// Writes an information message on the log
+		core.startGroup(`Searching API by name "${endPointName}"...`);
 		// Invokes a recursive function to perform the search
 		(function recursiveSearch(count, page) {
 			// Executes the REST call to the Admin API to get the list of all endpoints that
@@ -127,6 +134,9 @@ class Application {
 						let apiEndPoint = apiEndPoints.find(ep => ep.apiEndPointName == endPointName);
 						// Check if the endpoint was found on this page
 						if (apiEndPoint) {
+							// Writes an information message on the log
+							core.info(`Found (ID: ${apiEndPoint.apiEndPointId}).`);
+							core.endGroup();
 							// Invokes the callback to continue
 							// the workflow and consume the endpoint
 							callback.call(this, apiEndPoint);
@@ -138,12 +148,18 @@ class Application {
 								// Recursively invokes the function by requesting the next page
 								recursiveSearch(count, page + 1);
 							} else {
+								// Writes an information message on the log
+								core.info('Not found.');
+								core.endGroup();
 								// Invokes the callback inidicating that
 								// the endpoint has not been found
 								callback.call(this, null);
 							}
 						}
 					} else {
+						// Writes an information message on the log
+						core.info('Not found.');
+						core.endGroup();
 						// Invokes the callback inidicating that
 						// the endpoint has not been found
 						callback.call(this, null);
@@ -162,6 +178,8 @@ class Application {
 	 * @param {Function((Object) => void)}	callback - callback that intercepts the newly created API endpoint.
 	 */
 	createEndpoint(callback) {
+		// Writes an information message on the log
+		core.startGroup('Create new API definition...');
 		// Executes the REST call to the Admin API
 		this.eg.auth({
 			path: '/api-definitions/v2/endpoints/files',
@@ -176,12 +194,17 @@ class Application {
 				'contractId': this.contractId,
 				'groupId': this.groupId
 			}
-		}).send(function (error, response, body) {
+		}).send(function(error, response, body) {
 			// Check if the call was successful
 			if (response) {
+				// Gets the HTTP response body
+				response = response.data;
+				// Writes an information message on the log
+				core.info(`Created API (ID: ${response.apiEndPointId}).`);
+				core.endGroup();
 				// Invokes the callback to continue
 				// the workflow and consume the endpoint
-				callback.call(this, response.data);
+				callback.call(this, response);
 			} else {
 				// Writes an error message and aborts execution
 				Application.handleHttpError(error);
@@ -200,11 +223,13 @@ class Application {
 	updateEndpoint(apiId, versionNumber, overrideVersion, callback) {
 		// Check whether to upgrade the API version
 		if (overrideVersion) {
-			core.info(`# Overriding definition of API ${apiId}...`);
+			// Writes an information message on the log
+			core.info(`Overriding definition of API ${apiId}...`);
 			// Update the definition of the latest API version
 			this.editVersion(apiId, versionNumber, callback);
 		} else {
-			core.info(`# Creation of a new version of API ${apiId}...`);
+			// Writes an information message on the log
+			core.info(`Creation of a new version of API ${apiId}...`);
 			// Clone the latest version of the API
 			this.cloneVersion(apiId, versionNumber, function(cloneVersion) {
 				// Update the definition of this cloned API version
@@ -221,6 +246,7 @@ class Application {
 	 * @param {Function((integer) => void)}	callback		- callback that intercepts the version number of the clone.
 	 */
 	cloneVersion(apiId, versionNumber, callback) {
+		// Writes an information message on the log
 		core.info(`Cloning of API ${apiId} version ${versionNumber} in progress...`);
 		// Executes the REST call to the Admin API
 		this.eg.auth({
@@ -234,6 +260,7 @@ class Application {
 			if (response) {
 				// Retrieves the version value of the API clone
 				let cloneVersion = response.data.versionNumber;
+				// Writes an information message on the log
 				core.info(`Cloned the API ${apiId} version ${versionNumber} (new version: ${cloneVersion}).`);
 				// Invokes the callback that intercepts the value of the API clone version
 				callback.call(this, cloneVersion);
@@ -251,6 +278,7 @@ class Application {
 	 * @param {Function((Object) => void)}	callback		- callback that intercepts the updated API endpoint.
 	 */
 	editVersion(apiId, versionNumber, callback) {
+		// Writes an information message on the log
 		core.info(`Updating the API definition ${apiId} version ${versionNumber}...`);
 		// Executes the REST call to the Admin API
 		this.eg.auth({
@@ -324,23 +352,13 @@ class Application {
 	 * Application main function.
 	 */
 	main() {
-		// Log group: 'Refining API' - start
-		core.startGroup('Refining API definition in progress...');
 		// Prepares the OpenAPI specification for import into the Akamai Gateway
 		this.refineOpenApiSpec(function(apiMetadata) {
-			// Log group: 'Refining API' - complete
-			core.info('Refining API definition completed.');
-			core.endGroup();
-			// Log group: 'Search API by name' - start
-			core.startGroup(`Search API by name "${apiMetadata.name}":`);
 			// Search among all API endpoints for the one with the required name
 			this.getEndpointByName(apiMetadata.name, function(endPoint) {
 				// Check if an endpoint with the requested name already exists
 				if (endPoint) {
-					// Log group: 'Search API by name' - end
-					core.info(`API "${apiMetadata.name}" already exists.`);
-					core.endGroup();
-					// Log groudp: 'Update API definition' - start
+					// Writes an information message on the log
 					core.startGroup(`Update API ${endPoint.apiEndPointId} definition...`);
 					// Check whether to overwrite the current version or to upgrade
 					let overrideVersion = Application.sameMajorMinorVersion(endPoint.source.apiVersion, apiMetadata.version);
@@ -349,31 +367,24 @@ class Application {
 						// Writes an information message on the log
 						core.info(`Updated API (ID: ${endPoint.apiEndPointId}, version: ${endPoint.versionNumber}).`);
 						core.endGroup();
+						// Operation successfully completed
+						core.info("Done");
 						// Exports the unique identifier of the API within the Akamai Gateway
 						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
 						// Exports the version number of the API within the Akamai Gateway
 						core.setOutput("api-version-number", endPoint.versionNumber);
-						// Operation successfully completed
-						core.info("Done");
 					});
 				} else {
-					// Log group: 'Search API by name' - end
-					core.info(`API "${apiMetadata.name}" not found.`);
-					core.endGroup();
 					// Log groudp: 'Create new API definition' - start
 					core.startGroup("Create new API definition...");
 					// Creates a new API by importing the definition provided as input
 					this.createEndpoint(function(endPoint) {
-						// Writes an information message on the log
-						core.info(`Created API (ID: ${endPoint.apiEndPointId}).`);
-						core.endGroup();
+						// Operation successfully completed
+						core.info("Done");
 						// Exports the unique identifier of the API within the Akamai Gateway
 						core.setOutput("api-endpoint-id", endPoint.apiEndPointId);
 						// Exports the version number of the API within the Akamai Gateway
 						core.setOutput("api-version-number", endPoint.versionNumber);
-						// Operation successfully completed
-						core.info("Done");
-						
 					});
 				}
 			});
